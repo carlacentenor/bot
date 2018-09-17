@@ -4,7 +4,11 @@
   "description": "bot de messenger",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "8.9.1"
   },
   "author": "Carla Centeno Ramos",
   "license": "MIT",
