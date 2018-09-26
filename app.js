@@ -3,6 +3,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
+const requestPromise = require('request-promise');
 const access_token = "EAAIM30ZBXoioBAA0fZCXx2ydHZB4y0KmINNQsijzu1TVic8dIaRrSOqDFP990KRRBIZBfYIKthCPntUdWyXga06bHZAFzawZC07V0v6AOiLA17snxwnIjIH8lQIabO6vTy7ZCJveBV7OV7lFsHCDTCWGkdxcGcA9w7sG3kW5iJ6JwZDZD"
 
 const app = express();
@@ -47,7 +48,7 @@ function handleEvent(senderId, event) {
       console.log('Error:', err);
     } else if (res.statusCode !== 200) {
       console.log('Status:', res.statusCode);
-    } else { 
+    } else {
       const dataUser = data;
       if (event.message) {
         handleMessage(senderId, event.message, dataUser)
@@ -59,13 +60,13 @@ function handleEvent(senderId, event) {
 
 }
 
-function handleMessage(senderId, message,dataUser) {
+function handleMessage(senderId, message, dataUser) {
   if (message.text) {
-    defaultMessage(senderId,dataUser);
+    defaultMessage(senderId, dataUser);
   }
 }
 
-function defaultMessage(senderId,dataUser) {
+function defaultMessage(senderId, dataUser) {
   const messageData = {
     "recipient": {
       "id": senderId
@@ -77,34 +78,33 @@ function defaultMessage(senderId,dataUser) {
   callSendApi(messageData);
 }
 
-function messageWelcome(senderId,dataUser) {
+function messageWelcome(senderId, dataUser) {
   const messageData = {
     "recipient": {
       "id": senderId
     },
     "message": {
-      "attachment":{
-        "type":"template",
-        "payload":{
-          "template_type":"button",
-          "text":`Hola 😁 ${dataUser.first_name}!, soy PapaBot y estoy aquí para ayudarte con estas opciones `,
-          "buttons":[
-            {
-              "type":"postback",
-              "title":"Quiero Pizza",
-              "payload":"EAT_PIZZA"
+      "attachment": {
+        "type": "template",
+        "payload": {
+          "template_type": "button",
+          "text": `Hola 😁 ${dataUser.first_name}!, soy PapaBot y estoy aquí para ayudarte con estas opciones `,
+          "buttons": [{
+              "type": "postback",
+              "title": "Quiero Pizza",
+              "payload": "EAT_PIZZA"
             },
             {
-              "type":"postback",
-              "title":"Dónde esta mi pizza?",
-              "payload":"STATUS_PIZZA"
+              "type": "postback",
+              "title": "Dónde esta mi pizza?",
+              "payload": "STATUS_PIZZA"
             },
             {
-              "type":"postback",
-              "title":"Zona de Reparto",
-              "payload":"UBICATION_LOCAL_PIZZA"
+              "type": "postback",
+              "title": "Zona de Reparto",
+              "payload": "UBICATION_LOCAL_PIZZA"
             }
-           
+
           ]
         }
       }
@@ -113,10 +113,82 @@ function messageWelcome(senderId,dataUser) {
   callSendApi(messageData);
 }
 
-function handlePostback(senderId, payload,dataUser) {
+
+function messageEatPizza(senderId, dataUser) {
+  const messageData = {
+    "recipient": {
+      "id": senderId
+    },
+    "message": {
+      "attachment": {
+        "type": "template",
+        "payload":{
+          "template_type":"generic",
+          //"image_aspect_ratio": "square",
+          "elements":[
+            {
+              "title":`Carta`,
+              "image_url":"https://user-images.githubusercontent.com/32285482/44165073-60394900-a08d-11e8-8714-2dd16e0d08d2.png",
+              "buttons":[
+                {
+                  "type":"web_url",
+                  "url":'https://literate-gum.glitch.me/dynamic-webview',
+                  "title":"Pizzas",
+                  // "messenger_extensions": true,
+                  "webview_height_ratio" : 'full'
+                },
+                {
+                  "type":"web_url",
+                  "url":'https://literate-gum.glitch.me/dynamic-webview',
+                  "title":"Complementos",
+                  // "messenger_extensions": true,
+                  "webview_height_ratio" : 'full'
+                }
+                
+              ]
+            },
+              {
+              "title":`Promociones `,
+              "image_url":"https://user-images.githubusercontent.com/32285482/44165070-5fa0b280-a08d-11e8-82b5-8c586c8ecbb0.png",
+              "buttons":[
+                {
+                  "type":"web_url",
+                  "url":'https://literate-gum.glitch.me/dynamic-webview',
+                  "title":"La Favorita",
+                  // "messenger_extensions": true,
+                  "webview_height_ratio" : 'full'
+                },
+                {
+                  "type":"web_url",
+                  "url":'https://literate-gum.glitch.me/dynamic-webview',
+                  "title":"La 2da a 1 sol",
+                  // "messenger_extensions": true,
+                  "webview_height_ratio" : 'full'
+                }
+              
+                
+              ]
+            }
+            
+            
+          ]
+        }
+      }
+    }
+  }
+  callSendApi(messageData);
+}
+
+
+
+
+function handlePostback(senderId, payload, dataUser) {
   switch (payload) {
     case "GET_STARTED_PUGPIZZA":
-      messageWelcome(senderId,dataUser);
+      messageWelcome(senderId, dataUser);
+      break;
+    case "EAT_PIZZA":
+      messageEatPizza(senderId, dataUser);
       break;
   }
 }
